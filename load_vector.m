@@ -12,7 +12,7 @@ function [ f ] = load_vector( Edof, magnitude)
 total_dof = 21*3;
 n_elements = 20;
 middle_node = n_elements/2+1;
-vertical_dof = middle_node*3-2;
+vertical_dof = middle_node*3-1;
 
 f = zeros(total_dof, 1);
-f(vertical_dof) =magnitude;
+f(vertical_dof) = magnitude;
