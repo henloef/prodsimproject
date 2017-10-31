@@ -1,11 +1,11 @@
-clc, clear all
+clc, clear
 
 %% Properties
 E = 2.1e5; %% N/mm^2
 thickness = 10; % mm
 width = 100; % mm
 H = 400; % height mm
-max_load = -200; % N
+max_load = -100e3; % N
 steps = 100;
 dimensionless = 0;
 
@@ -19,42 +19,17 @@ K = global_stiffness(Edof, Coord, ep);
 
 %% Boundary conditions and load
 bc = [1 0; 2 0; 61 0; 62 0];
-load = zeros(1,steps);
-displacement = zeros(1,steps);
+f = load_vector(Edof, max_load);
 
-%% Main loop
-for i = 1:steps
-    % Load vector
-    magnitude = max_load/steps*i;
-    f = load_vector(Edof, magnitude);
-    % Solve
-    [a,r] = solveq(K, f, bc);
-    
-    if dimensionless == 1
-        load(i) = abs(magnitude)/(E*A);
-        displacement(i) = abs(min(a))/H;
-    else
-        load(i) = abs(magnitude);
-        displacement(i) = abs(min(a));        
-    end
-end
+%% Solve
+[a,r] = solveq(K, f, bc);
+max_disp = max(abs(a))
+% Abaqus gir 0.3849 for 200N
 
-%% Plot response curve
+%% Plot deformed
+[Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
+plotpar = [2 2 1];
+sfac = 1;
+Ed = extract(Edof, a);
+eldisp2(Ex, Ey, Ed, plotpar, sfac);
 
-plot(displacement, load);
-    
-if dimensionless == 1
-    xlabel('Dimensionless displacement u/H')
-    ylabel('Dimensionless load P/EA')
-else
-    xlabel('Displacement [mm]')
-    ylabel('Load [N]')    
-end
-
-% Abaqus gir 0.3849
-% Matlab gir 0.4993
-disp(max(displacement));
-
-%% Plot geometry
-%[Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
-%eldraw2(Ex,Ey)
