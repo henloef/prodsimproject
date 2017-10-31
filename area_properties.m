@@ -4,8 +4,8 @@ function [ A, I ] = area_properties( t, w )
 % PURPOSE
 %  Returns the area and second moment of inertia of a circular section
 %
-% INPUT:  t = thickness
-%         w = width
+% INPUT:  t = thickness [mm]
+%         w = width [mm]
 % OUTPUT: A : area mm^2
 %         I : moment of intertia mm^4
 %--------------------------------------------------------------------
