@@ -10,14 +10,16 @@ function [ K ] = global_stiffness( Edof, Coord, ep )
 % OUTPUT: K : global stiffness matrix
 %--------------------------------------------------------------------
 
-total_dof = numel(Edof);
-n_elements = total_dof/3-1;
+total_dof = 21*3;
 
 K = zeros(total_dof);
 
-for i=1:n_elements
+
+for i=1:20
     % Elements stiffness matrix
-    Ke = beam2e(Coord(i,1), Coord(i,2), ep);
+    ex = transpose(Coord(i:i+1,1));
+    ey = transpose(Coord(i:i+1,2));
+    Ke = beam2e(ex, ey, ep);
     % Add to global stiffness matrix
     K = assem(Edof(i,:), K, Ke);
 end
