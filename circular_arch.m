@@ -1,6 +1,6 @@
 %buckling of deep cicular arch
 %creates matrices Edof, dof, and node_coords 
-clear all;
+function [Edof, node_coords, dof] = circular_arch() 
 R = 1000; %mm radius
 H = 400; %mm height
 h = 10; %mm thickness
