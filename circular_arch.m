@@ -43,4 +43,4 @@ for i = 1:length(theta_list)
 end
 
 
-    
+    %skriver noe for å logge meg inn
