@@ -1,4 +1,4 @@
-clc, clear
+clc, clear, close all
 
 %% Properties
 E = 2.1e5; %% N/mm^2
@@ -29,7 +29,7 @@ Coord_base = Coord;
 for i=1:steps
     f = load_vector(Edof, load(i));
     [a,q] = solveq(K, f, bc);
-    residual(i+1)
+    residual(i+1) = sum(K*a);
     displacement(i+1) = max(abs(a));
     Coord = update_coord(Coord_base, a);
     K = global_stiffness(Edof, Coord, ep);
@@ -43,3 +43,10 @@ eldisp2(Ex, Ey, Ed, plotpar, sfac);
 
 figure
 plot(displacement, abs(load))
+xlabel('displacement [mm]')
+ylabel('load [N]')
+
+figure
+plot(displacement, residual)
+xlabel('displacement [mm]')
+ylabel('internal force [N]')
