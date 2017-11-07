@@ -1,4 +1,7 @@
-function [Ke, fe]=nonlinbeam2e(Edof_0, Edof_n) %Assume that elDof contains the deformations from element degree of freedom x,y,rot for each node 
+function [fi]=nonlinbeam2e(a_0, a_n, Ke) 
+
+
+%Assume that elDof contains the deformations from element degree of freedom x,y,rot for each node 
 %NONLINBEAM Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -8,11 +11,11 @@ function [Ke, fe]=nonlinbeam2e(Edof_0, Edof_n) %Assume that elDof contains the d
 I_1 = [1, 0]; % global x direction vector
 I_2 = [0, 1]; % global y direction vector
 
-global_coord_system = [I_1,I_2];
 
-ex = [Edof_0(1) Edof_0(4) Edof_n(1) Edof_n(4)];
-ey = [Edof_0(2) Edof_0(5) Edof_n(2) Edof_n(5)];
-erot = [Edof_0(3) Edof_0(6) Edof_n(3) Edof_n(6)];
+
+ex = [a_0(1) a_0(4) a_n(1) a_n(4)];
+ey = [a_0(2) a_0(5) a_n(2) a_n(5)];
+erot = [a_0(3) a_0(6) a_n(3) a_n(6)];
 
 x1_0 = [ex(1) ey(1)];
 x2_0 = [ex(2) ey(2)];
@@ -28,7 +31,7 @@ x1_n = [ex(3) ey(3)];
 
 x2_n = [ex(4) ey(4)];
 
-[T_n xc_n] = makeXTilde(x1_n,x2_n);
+[T_n, xc_n] = makeXTilde(x1_n,x2_n);
 
 
 xtilde1_n = T_n(x1_n-xc_n);
@@ -44,41 +47,42 @@ utilde_d2 = (xtilde2_n-xtilde2_0);
 %% Finding deformational rotations
 
 
-%Finding the nodal deformation rotation
+%Finding angle between rigid body translation
 
-%Finding noce coordinates in respect to local coordinate system of
-%0-configuration
+v_0 = [T_0(1) T_0(2) 0]; %Parallell vector 0 config
+v_n = [T_n(1) T_n(2) 0]; %Parallell vector n config
+v_horizontal = [1 0 0];
 
-x1_n_local = T_0\x1_n;
-x2_n_local = T_0\x2_n;
+rigidTransAngle = asin(v_0(1)*v_n(2)-v_0(2)*v_n(1));
+globalAngle = asin(v_n(1)*v_horizontal(2)-v_n(2)*v_horizontal(1));
+
+deltaTotalAngle_1 = erot(3)-erot(1);
+deltaTotalAngle_2 = erot(4)-erot(2);
 
 
-
-alpha = atan((x2_n_local(2) - x1_n_local(2))/(x2_n_local(1)-x1_n_local(1))); %[radians]
-
-
-
-R_a = [alpha+erot(3) alpha+erot(4)];
-  
-
-Rtilde_d = T_n*R_a*T_0';
-
-c = cos(theta);
-s = sin(theta);
-
-R = [c  -s  0; s  c  0; 0  0  1];
+thetatilde_d1 = deltaTotalAngle_1 - rigidTransAngle;
+thetatilde_d2 = deltaTotalAngle_2 - rigidTransAngle;
 
 
 
+vtilde_d = [utilde_d1(1); utilde_d1(2); thetatilde_d1; utilde_d2(1); utilde_d2(2); thetatilde_d2];
 
 
 
+c = cos(globalAngle);
+s = sin(globalAngle);
+globalTrans =   [c   -s    0    0    0   0;
+                 s    c    0    0    0   0;
+                 0    0    1    0    0   0;
+                 0    0    0    c   -s   0;
+                 0    0    0    s    c   0;
+                 0    0    0    0    0   1];
 
 
 
+fi = globalTrans'*Ke*vtilde_d;
 
 
-EDDV; %element deformational displacement vector
 
 
 end
