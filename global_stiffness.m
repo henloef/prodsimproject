@@ -2,7 +2,7 @@ function [ K ] = global_stiffness( Edof, Coord, ep )
 % [K]=global_stiffness( Edof, Coord, ep )
 %--------------------------------------------------------------------
 % PURPOSE
-%  Returns the area and second moment of inertia of a circular section
+% Generate global stiffness matrix for a structure
 %
 % INPUT:  Edof = topology matrix
 %         Coord = global coordinate matrix
