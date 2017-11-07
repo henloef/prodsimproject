@@ -11,7 +11,7 @@ function [ K, fi ] = global_K_internal_force(Edof, Coord_0, a, ep)
 % OUTPUT: K = global stiffness matrix
 %         fi = global internal forces
 %--------------------------------------------------------------------
-total_dof = size(Coord,1)*3;
+total_dof = size(Coord_0,1)*3;
 n_elements = size(Edof,1);
 K = zeros(total_dof);
 fi = zeros(total_dof, 1);
@@ -21,9 +21,11 @@ for i=1:n_elements
     % Elements stiffness matrix
     ex = transpose(Coord(i:i+1,1));
     ey = transpose(Coord(i:i+1,2));
-    Ke = nonlinbeam2e(ex, ey, ep);
-    % Add to global stiffness matrix
+    Ke = beam2e(ex, ey, ep);
+    fie = nonlinbeam2e(Coord_0(element), Coord_n(element), Ke);
+    % Add to global stiffness and internal force
     K = assem(Edof(i,:), K, Ke);
+    fi = assem_fi(Edof(i,:), fi, fie);
 
 end
 
