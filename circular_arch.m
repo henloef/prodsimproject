@@ -1,10 +1,10 @@
 %buckling of deep cicular arch
 %creates matrices Edof, dof, and node_coords 
-function [Edof, node_coords, dof] = circular_arch() 
+function [Edof, node_coords, dof] = circular_arch(n_elements) 
 R = 1000; %mm radius
 H = 400; %mm height
 h = 10; %mm thickness
-n_elements = 20; %number of beam elements
+% n_elements = 20; %number of beam elements
 L = 1600; %mm distance between hinges
 E = 2.1e5; %N/mm^2 elastic modulus
 nu = 0; % poisson's ratio

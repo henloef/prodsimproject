@@ -10,7 +10,7 @@ function [ fi ] = assem_fi( Edofe, fi, fie )
 % OUTPUT: fi = global internal forces, dim = n_dofx1
 %--------------------------------------------------------------------
 for i = 1:length(fie)
-    fi(Edofe(i+1)) = fie(i);
+    fi(Edofe(i+1)) = fi(Edofe(i+1)) + fie(i);
 end
 
 end

@@ -26,7 +26,7 @@ for i=1:n_elements
     
     % Element stiffness matrix
     Ke = beam2e(ex_n, ey_n, ep);
-    fie = nonlinbeam2e(a_0, a_n, Ke);
+    fie = nonlinbeam2e(a_0, a_n, ep);
     %fie = zeros(6,1); %only for testing
     % Add to global stiffness and internal force
     K = assem(Edof(i,:), K, Ke);
