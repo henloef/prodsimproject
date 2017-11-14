@@ -1,4 +1,4 @@
-function [fi]=nonlinbeam2e(a_0, a_n) 
+function [fi]=nonlinbeam2e(a_0, a_n, ep) 
 % [fi]=nonlinbeam2e(a_0, a_n, Ke)
 %--------------------------------------------------------------------
 % PURPOSE
@@ -96,7 +96,11 @@ globalTrans =   [c   -s    0    0    0   0;
                  0    0    0    0    0   1];
 
 %fe=G'*fle;
+ b=[ ex(4)-ex(3); ey(4)-ey(3) ];
+  L=sqrt(b'*b);  
 
+ E=ep(1);  A=ep(2);  I=ep(3);
+ 
 Kle=[E*A/L   0            0      -E*A/L      0          0 ;
          0   12*E*I/L^3   6*E*I/L^2  0   -12*E*I/L^3  6*E*I/L^2;
          0   6*E*I/L^2    4*E*I/L    0   -6*E*I/L^2   2*E*I/L;
