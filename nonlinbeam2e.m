@@ -1,4 +1,4 @@
-function [fi]=nonlinbeam2e(a_0, a_n, Ke) 
+function [fi]=nonlinbeam2e(a_0, a_n) 
 % [fi]=nonlinbeam2e(a_0, a_n, Ke)
 %--------------------------------------------------------------------
 % PURPOSE
@@ -7,6 +7,8 @@ function [fi]=nonlinbeam2e(a_0, a_n, Ke)
 
 % INPUT:  a_0 - Nodal coordinates for element in zero-configuration.
 %         a_n - Nodal coordinates for current configuration.
+%         must be formulated a_0 = [x01 y01 r01 x02 y02 r02], for zero
+%         -configuration for node 1 and 2.
 %       
 %         Ke - element stiffness generated from beam2e
 %
@@ -27,14 +29,14 @@ I_2 = [0, 1]; % global y direction vector
 
 
 
-ex = [a_0(1) a_0(4) a_n(1) a_n(4)];
-ey = [a_0(2) a_0(5) a_n(2) a_n(5)];
-erot = [a_0(3) a_0(6) a_n(3) a_n(6)];
+ex = [a_0(1) a_0(4) a_n(1) a_n(4)]; %[x10 x20 x1n x2n]
+ey = [a_0(2) a_0(5) a_n(2) a_n(5)]; %[y10 y20 y1n y2n]
+erot = [a_0(3) a_0(6) a_n(3) a_n(6)]; %[r10 r20 r1n r2n]
 
-x1_0 = [ex(1) ey(1)];
-x2_0 = [ex(2) ey(2)];
+x1_0 = [ex(1) ey(1)]; %Coordinate vector to node 1, zero-config
+x2_0 = [ex(2) ey(2)]; %Coordinate vector to node 2, zero-config
 
-[T_0, xc_0] = makeXTilde(x1_0,x2_0);
+[T_0, xc_0] = makeXTilde(x1_0,x2_0); %global to local coordinate tranformation for zero-configuration.
 
 xtilde1_0 = T_0*((x1_0-xc_0)');
 xtilde2_0 = T_0*((x2_0-xc_0)');
@@ -93,9 +95,16 @@ globalTrans =   [c   -s    0    0    0   0;
                  0    0    0    s    c   0;
                  0    0    0    0    0   1];
 
+%fe=G'*fle;
 
-
-fi = (globalTrans')*Ke*vtilde_d;
+Kle=[E*A/L   0            0      -E*A/L      0          0 ;
+         0   12*E*I/L^3   6*E*I/L^2  0   -12*E*I/L^3  6*E*I/L^2;
+         0   6*E*I/L^2    4*E*I/L    0   -6*E*I/L^2   2*E*I/L;
+       -E*A/L  0            0       E*A/L      0          0 ;
+         0   -12*E*I/L^3 -6*E*I/L^2  0   12*E*I/L^3  -6*E*I/L^2;
+         0   6*E*I/L^2    2*E*I/L    0   -6*E*I/L^2   4*E*I/L];
+     
+fi = (globalTrans)*Kle*vtilde_d;
 
 
 
