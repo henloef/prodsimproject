@@ -4,7 +4,6 @@ clc, clear, close all
 E = 2.1e5; %% N/mm^2
 thickness = 10; % mm
 width = 100; % mm
-H = 400; % height mm
 [A, I] = area_properties(thickness, width);
 ep = [E A I];
 
@@ -53,7 +52,7 @@ end
 %% Plots
 title_prefix = 'Newton iteration,';
 
-%% Plot deformed
+% Plot deformed
 Coord = new_coord(Coord_0,a);
 [Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
 plotpar = [2 2 1];
@@ -63,7 +62,7 @@ eldisp2(Ex, Ey, Ed, plotpar, sfac);
 title(strcat(title_prefix, ' geometry last increment'))
 saveas(gcf,'../fig/task4_geometry.png')
 
-%% Plot residual
+% Plot residual
 figure
 plot([1:1:max_iterations],r_plot(3,:))
 title(strcat(title_prefix, ' residual last increment'))
@@ -72,11 +71,15 @@ ylabel('residual [N]')
 grid on
 saveas(gcf,'../fig/task4_residual.png')
 
-%% Plot load displacement
+% Plot load displacement
 figure
 plot(u_plot,abs(f_magnitude))
+hold on
+plot([0 50.95],[0 abs(max_load)])
+legend('Newton iteration', 'Direct method')
 title(strcat(title_prefix, ' load/displacement'))
 xlabel('displacement [mm]')
+axis([0  200 0 3.5e4])
 ylabel('load [N]')
 grid on
 saveas(gcf,'../fig/task4_load_disp.png')
