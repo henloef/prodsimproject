@@ -5,7 +5,7 @@ E = 2.1e5; %% N/mm^2
 thickness = 10; % mm
 width = 100; % mm
 H = 400; % height mm
-max_load = -100; % N
+max_load = -1e4; % N
 
 increments = 100;
 max_iterations = 10;

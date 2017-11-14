@@ -5,17 +5,19 @@ E = 2.1e5; %% N/mm^2
 thickness = 10; % mm
 width = 100; % mm
 H = 400; % height mm
-max_load = -100; % N
+max_load = -5e4; % N
 
 increments = 100;
-max_iterations = 10;
-max_residual = 10;
+max_iterations = 50;
+max_residual = 0.01;
 iteration = 1;
 
-f_magnitude = [0:max_load/increments: max_load];
+f_magnitude = 0:max_load/increments: max_load;
+inc = 1:100;
+res_plot = zeros(length(inc),1);
 
 %% Create geometry
-[Edof, Coord_0,  Dof] = utkrager();
+[Edof, Coord_0,  Dof] = utkrager(2);
 total_dof = size(Coord_0,1)*3;
 
 %% Section and material properties
@@ -37,6 +39,7 @@ for i=1:increments
         
         % Check threshold for residual
         r_sum = sqrt(r'*r); %Root sum squared
+%         res_plot(i) = r_sum + f_magnitude(i);
         if r_sum < max_residual
             break
         end
@@ -52,6 +55,9 @@ plotpar = [2 2 1];
 sfac = 1;
 Ed = extract(Edof, a);
 eldisp2(Ex, Ey, Ed, plotpar, sfac);
+
+% figure
+% plot(inc, res_plot)
 
 % figure
 % plot(displacement, abs(load))

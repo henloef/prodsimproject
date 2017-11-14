@@ -12,4 +12,4 @@ function [ f ] = load_vector_utkrager( Edof, magnitude)
 n_elements = size(Edof, 1);
 total_dof = (n_elements + 1)*3;
 f = zeros(total_dof, 1);
-f(5) = magnitude;
+f(total_dof-1) = magnitude;
