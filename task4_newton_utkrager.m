@@ -5,41 +5,43 @@ E = 2.1e5; %% N/mm^2
 thickness = 10; % mm
 width = 100; % mm
 H = 400; % height mm
-max_load = -5e4; % N
+max_load = -5e5; % N
 
 increments = 100;
-max_iterations = 50;
-max_residual = 0.01;
+max_iterations = 10;
+max_residual = 0.001;
 iteration = 1;
 
 f_magnitude = 0:max_load/increments: max_load;
-inc = 1:100;
-res_plot = zeros(length(inc),1);
+residual_plot = zeros(increments,max_iterations);
+displacement_plot = zeros(length(f_magnitude),1);
 
 %% Create geometry
-[Edof, Coord_0,  Dof] = utkrager(2);
+[Edof, Coord_0,  Dof] = utkrager(20);
 total_dof = size(Coord_0,1)*3;
+bc = [1 0; 
+      2 0;
+      total_dof-2 0;
+      total_dof-1 0];
 
 %% Section and material properties
 [A, I] = area_properties(thickness, width);
 ep = [E A I];
 
-%% Boundary conditions
-bc = [1 0; 2 0; 3 0];
-
 %% Solve
 a = zeros(total_dof,1);
 for i=1:increments
-    f = load_vector_utkrager(Edof, f_magnitude(i));
+    f = load_vector_bridge(Edof, f_magnitude(i));
     while iteration <= max_iterations
         [K, fi] = global_K_internal_force(Edof, Coord_0, a, ep);
-        r = f - fi; 
+        fi = remove_bc_from_fi(fi, bc);
+        r = f - fi;
         [d_a, q_dummy] = solveq(K, r, bc);
         a = a + d_a;
         
         % Check threshold for residual
         r_sum = sqrt(r'*r); %Root sum squared
-%         res_plot(i) = r_sum + f_magnitude(i);
+        residual_plot(i, iteration) = r_sum;
         if r_sum < max_residual
             break
         end
@@ -56,8 +58,12 @@ sfac = 1;
 Ed = extract(Edof, a);
 eldisp2(Ex, Ey, Ed, plotpar, sfac);
 
-% figure
-% plot(inc, res_plot)
+figure
+plot([1:1:max_iterations],residual_plot(10,:))
+% axis([0 max_iterations 0 0.1])
+
+figure
+plot(displacement_plot,abs(f_magnitude))
 
 % figure
 % plot(displacement, abs(load))
