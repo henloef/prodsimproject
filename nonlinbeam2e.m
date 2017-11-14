@@ -48,20 +48,21 @@ utilde_d2 = (xtilde2_n-xtilde2_0);
 
 %Finding angle between rigid body translation
 
-v_0 = [T_0(1) T_0(2) 0]; %Parallell vector 0 config
-v_n = [T_n(1) T_n(2) 0]; %Parallell vector n config
-v_horizontal = [1 0 0];
 
-rigidTransAngle = asin(v_0(1)*v_n(2)-v_0(2)*v_n(1));
-globalAngle = asin(v_n(1)*v_horizontal(2)-v_n(2)*v_horizontal(1));
+v_0 = [T_0(1,1) T_0(1,2) 0]; %Parallell vector 0 config in reference to what to global coordinate system, from makeXtilde.
+v_n = [T_n(1,1) T_n(1,2) 0]; %Parallell vector n config in reference to what to global coordinate system, from makeXtilde.
+v_horizontal = [1 0 0]; %parallell vecor global horizontal
 
-deltaTotalAngle_1 = erot(3)-erot(1);
-deltaTotalAngle_2 = erot(4)-erot(2);
+globalAngle = asin((-v_horizontal(1))*(-v_n(2))-v_horizontal(2)*v_n(1)); %Global angle in reference to local coordinate system. 
 
+theta_rigid_total_cross = ((-v_0(1))*(-v_n(2))-v_0(2)*v_n(1)); %Gives positive sign for CCW rotation
 
-thetatilde_d1 = deltaTotalAngle_1 - rigidTransAngle;
-thetatilde_d2 = deltaTotalAngle_2 - rigidTransAngle;
+theta_rigid_total = asin(theta_rigid_total_cross); % This is total translation angle, with reference to 0-configuration
 
+%Nodal total deformational rotation.
+
+thetatilde_d1 = erot(3)-theta_rigid_total;
+thetatilde_d2 = erot(4)-theta_rigid_total;
 
 
 vtilde_d = [utilde_d1(1); utilde_d1(2); thetatilde_d1; utilde_d2(1); utilde_d2(2); thetatilde_d2];
@@ -79,7 +80,7 @@ globalTrans =   [c   -s    0    0    0   0;
 
 
 
-fi = globalTrans'*Ke*vtilde_d;
+fi = (globalTrans')*Ke*vtilde_d;
 
 
 
