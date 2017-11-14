@@ -31,7 +31,7 @@ sfac = 1;
 Ed = extract(Edof, a);
 eldisp2(Ex, Ey, Ed, plotpar, sfac);
 title(strcat(title_prefix, ' geometry last increment'))
-saveas(gcf,'../fig/task2_geometry.png')
+saveas(gcf,'../fig/geometry_original.png')
 
 % Plot load displacement
 figure

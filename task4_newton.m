@@ -72,11 +72,12 @@ grid on
 saveas(gcf,'../fig/task4_residual.png')
 
 % Plot load displacement
-figure
+abaqus = csvread('./abaqus_data/nonlingeom26700N.csv');
+figure; hold on
 plot(u_plot,abs(f_magnitude))
-hold on
 plot([0 50.95],[0 abs(max_load)])
-legend('Newton iteration', 'Direct method')
+plot(abaqus(:,1),abaqus(:,2))
+legend('Newton iteration', 'Direct method', 'Abaqus')
 title(strcat(title_prefix, ' load/displacement'))
 xlabel('displacement [mm]')
 axis([0  200 0 3.5e4])
