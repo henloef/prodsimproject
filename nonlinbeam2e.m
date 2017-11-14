@@ -1,10 +1,25 @@
 function [fi]=nonlinbeam2e(a_0, a_n, Ke) 
+% [fi]=nonlinbeam2e(a_0, a_n, Ke)
+%--------------------------------------------------------------------
+% PURPOSE
+% Generate elemental internal force vector. 
+% 
 
-
-%Assume that elDof contains the deformations from element degree of freedom x,y,rot for each node 
-%NONLINBEAM Summary of this function goes here
-%   Detailed explanation goes here
-
+% INPUT:  a_0 - Nodal coordinates for element in zero-configuration.
+%         a_n - Nodal coordinates for current configuration.
+%       
+%         Ke - element stiffness generated from beam2e
+%
+% OUTPUT: fi - elemental internal force vector.
+%
+%       fi = [Fx1 Fy1 Mr1 Fx2 Fy2 Mr2], 
+% 
+%       Fxn - Local horizontal force in node n
+%       Fyn - Local vertical force node n
+%       Mrn - Moment node n
+%       
+        
+%--------------------------------------------------------------------
 
 %Forming the deformational displacement vector
 I_1 = [1, 0]; % global x direction vector
