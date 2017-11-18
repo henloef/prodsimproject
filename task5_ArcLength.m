@@ -26,10 +26,11 @@ ep = [E A I];
 bc = [1 0; 2 0; 61 0; 62 0];
 
 %% Solve
+a = zeros(total_dof,1);
 for i=1:increments
     %r(a',lam') = f_int(a_0 + da) - (lam_0 - dlam)q = 0
-    %r(a'', lam'') = f_int(a_0 + da_0 + dla_0) - (lam_0 - dlam - dllam)q =
-    %0
+    %r(a'', lam'') = f_int(a_0 + da_0 + dla_0) - (lam_0 - dlam - dllam)q = 0
+    
 
 end
 %% Plot deformed
