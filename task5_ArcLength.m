@@ -26,13 +26,15 @@ bc = [1 0; 2 0; 61 0; 62 0];
 %% Solve
 
 
-f_magnitude = -25000; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
+f_magnitude = -27000*2; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
 q = load_vector(Edof, f_magnitude); %This is the load vector, where the values corresponds to force magnitude, and placement in vector corresponds to node and direction.
 lambda = 0;
 v_hat = zeros(total_dof,1);
 
 delta_s = 1;
+
 [K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
+
 w_q0 = solveqOM(K,q,bc);
 f = sqrt(1+(w_q0')*(w_q0)); 
 
@@ -66,7 +68,7 @@ while(lambda<0.9889)
     f = sqrt(1+(w_q')*(w_q));   %Just a simplification variable for the
                                 %relation between delta_s and delta_lambda
                                 
-    v_0 = delta_lambda*w_q; %v_0 should denote the horizontal component
+    %v_0 = delta_lambda*w_q; %v_0 should denote the horizontal component
                             %of the tangent predictor step. The tangent
                             %step in load-disp space is v_0_bar = [v_0; delta_lambda]
     
