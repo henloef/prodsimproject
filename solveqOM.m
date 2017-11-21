@@ -4,7 +4,6 @@ function [d] = solveqOM(K,q,bc)
      fdof=[1:nd]';
 %
      d=zeros(size(fdof));
-   
 %
      pdof=bc(:,1);
      dp=bc(:,2);
