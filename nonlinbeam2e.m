@@ -1,4 +1,4 @@
-function [fi]=nonlinbeam2e(a_0, a_n, ep) 
+function [fi,K]=nonlinbeam2e(a_0, a_n, ep) 
 % [fi]=nonlinbeam2e(a_0, a_n, Ke)
 %--------------------------------------------------------------------
 % PURPOSE
@@ -23,11 +23,6 @@ function [fi]=nonlinbeam2e(a_0, a_n, ep)
         
 %--------------------------------------------------------------------
 
-%Forming the deformational displacement vector
-I_1 = [1, 0]; % global x direction vector
-I_2 = [0, 1]; % global y direction vector
-
-
 
 ex = [a_0(1) a_0(4) a_n(1) a_n(4)]; %[x10 x20 x1n x2n]
 ey = [a_0(2) a_0(5) a_n(2) a_n(5)]; %[y10 y20 y1n y2n]
@@ -42,10 +37,9 @@ xtilde1_0 = T_0*((x1_0-xc_0)');
 xtilde2_0 = T_0*((x2_0-xc_0)');
 
 
-
 x1_n = [ex(3) ey(3)];
-
 x2_n = [ex(4) ey(4)];
+
 
 [T_n, xc_n] = makeXTilde(x1_n,x2_n);
 
@@ -64,25 +58,25 @@ utilde_d2 = (xtilde2_n-xtilde2_0);
 
 
 %Finding angle between rigid body translation
+v_0 = [T_0(1,1) T_0(1,2) 0]; %Parallell vector 0-configuration
+v_n = [T_n(1,1) T_n(1,2) 0]; %Parallell vector n-configuration
+v_horizontal = [1 0 0]; %Global horizontal vector
 
+%Global angle in reference to local coordinate system. 
+globalAngle = asin((-v_horizontal(1))*(-v_n(2))-v_horizontal(2)*v_n(1)); 
 
-v_0 = [T_0(1,1) T_0(1,2) 0]; %Parallell vector 0 config in reference to what to global coordinate system, from makeXtilde.
-v_n = [T_n(1,1) T_n(1,2) 0]; %Parallell vector n config in reference to what to global coordinate system, from makeXtilde.
-v_horizontal = [1 0 0]; %parallell vecor global horizontal
-
-globalAngle = asin((-v_horizontal(1))*(-v_n(2))-v_horizontal(2)*v_n(1)); %Global angle in reference to local coordinate system. 
-
-theta_rigid_total_cross = ((-v_0(1))*(-v_n(2))-v_0(2)*v_n(1)); %Gives positive sign for CCW rotation
-
-theta_rigid_total = asin(theta_rigid_total_cross); % This is total translation angle, with reference to 0-configuration
+%Calculating global elemental rigid rotation angle with reference
+%to 0-configuration.
+theta_rigid_total_cross = ((-v_0(1))*(-v_n(2))-v_0(2)*v_n(1)); 
+theta_rigid_total = asin(theta_rigid_total_cross); 
 
 %Nodal total deformational rotation.
-
 thetatilde_d1 = erot(3)-theta_rigid_total;
 thetatilde_d2 = erot(4)-theta_rigid_total;
 
 
-vtilde_d = [utilde_d1(1); utilde_d1(2); thetatilde_d1; utilde_d2(1); utilde_d2(2); thetatilde_d2];
+vtilde_d = [utilde_d1(1); utilde_d1(2); thetatilde_d1;
+			utilde_d2(1); utilde_d2(2); thetatilde_d2];
 
 
 
@@ -107,8 +101,19 @@ Kle=[E*A/L   0            0      -E*A/L      0          0 ;
        -E*A/L  0            0       E*A/L      0          0 ;
          0   -12*E*I/L^3 -6*E*I/L^2  0   12*E*I/L^3  -6*E*I/L^2;
          0   6*E*I/L^2    2*E*I/L    0   -6*E*I/L^2   4*E*I/L];
-     
-fi = (globalTrans)*Kle*vtilde_d;
+
+fi_local = Kle*vtilde_d;
+fi_spin = [-fi_local(2);
+            fi_local(1); 
+            0; 
+            -fi_local(5); 
+            fi_local(4); 
+            0;];
+G = [ 0 -1/L 0 0 1/L 0];
+Kle = Kle + fi_spin*G;
+
+fi = (globalTrans)*fi_local;
+K = globalTrans*Kle*globalTrans';
 
 
 
