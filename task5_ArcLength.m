@@ -9,7 +9,7 @@ ep = [E A I];
 max_load = -100; % N
 tolerance = 1.e-9; 
 
-increments = 50;
+increments = 132;
 max_iterations = 20;
 max_residual = 0.01;
 
@@ -26,35 +26,33 @@ bc = [1 0; 2 0; 61 0; 62 0];
 %% Solve
 
 
-f_magnitude = -27000*2; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
+f_magnitude = -290; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
 q = load_vector(Edof, f_magnitude); %This is the load vector, where the values corresponds to force magnitude, and placement in vector corresponds to node and direction.
 lambda = 0;
 v_hat = zeros(total_dof,1);
 
-delta_s = 1;
+delta_s = 15;
 
 [K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
-
 w_q0 = solveqOM(K,q,bc);
 f = sqrt(1+(w_q0')*(w_q0)); 
-
 delta_lambda = delta_s/f; 
-
-
 
 v_0 = delta_lambda*w_q0;
 
 
 iteration = 1;
 
-
 i = 1;
 umidplot = [];
 umidNode = 20/2+1;
 vertical_dof = umidNode*3-1;
+
+lambdaplot = [];
 count = 0;
-%for i = 1:increments;
-while(lambda<0.9889)
+count2 = 0;
+for i = 1:increments;
+%while(lambda<3)
     count = count +1;
     
     [K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
@@ -88,12 +86,13 @@ while(lambda<0.9889)
     
     %Updating force variable lambda, and global displacement. This is in
     %fact the predictor step.
-    lambda = lambda + delta_lambda
+    lambda = lambda + delta_lambda;
     v_hat = v_hat + v_0;
     umidplot(count) = v_hat(vertical_dof);
+    lambdaplot(count) = lambda;
     
     while iteration <= max_iterations %corrector
-        count = count +1;
+        count = count+1;
         [K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
         fi = remove_bc_from_fi(fi, bc);
           
@@ -105,14 +104,17 @@ while(lambda<0.9889)
         w_q = solveqOM(K,q,bc);
 %         w_r = K\r;
 %         w_r = remove_bc_from_fi( w_r, bc );
+        
         w_r = solveqOM(K,r,bc);
+        
+        
         
         del_lambda = -((w_q'*w_r)/(1+w_q'*w_q));
         
         lambda = lambda + del_lambda;
         v_hat = v_hat + (w_r+del_lambda*w_q);
         umidplot(count) = v_hat(vertical_dof);
-
+        lambdaplot(count) = lambda;
         % Check threshold for residual
         r_sum = sqrt(r'*r); %Root sum squared
         r_plot(i, iteration) = r_sum;
@@ -125,8 +127,8 @@ while(lambda<0.9889)
     end
     u_plot(i) = max(abs(v_hat));
     iteration = 1;
-    i  = i+1;
-    
+   
+    lambda_delta_lambda_del_lambdax1000 = [lambda delta_lambda del_lambda*1000]
 end
 
 
@@ -162,15 +164,10 @@ ylabel('umidVertTrans')
 
 umidplot(count)
 % Plot load displacement
-abaqus = csvread('./abaqus_data/nonlingeom26700N.csv');
-figure; hold on
-plot(u_plot,abs(f_magnitude))
-plot([0 50.95],[0 abs(max_load)])
-plot(abaqus(:,1),abaqus(:,2))
-legend('Newton iteration', 'Direct method', 'Abaqus')
-title(strcat(title_prefix, ' load/displacement'))
-xlabel('displacement [mm]')
-axis([0  200 0 3.5e4])
-ylabel('load [N]')
-grid on
+figure 
+plot(-umidplot,lambdaplot)
+title('umidplot,lambdaplot');
+xlabel('umid')
+ylabel('lambda')
+
 % saveas(gcf,'../fig/task4_load_disp.png')
