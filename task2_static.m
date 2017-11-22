@@ -24,20 +24,18 @@ max_disp = max(abs(a));
 %% Plots
 title_prefix = 'Direct stiffness,';
 
-% Plot deformed
+% Geometry
 [Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
 plotpar = [2 2 1];
 sfac = 1;
 Ed = extract(Edof, a);
 eldisp2(Ex, Ey, Ed, plotpar, sfac);
 title(strcat(title_prefix, ' geometry last increment'))
-saveas(gcf,'../fig/geometry_original.png')
 
-% Plot load displacement
+% Load displacement
 figure
 plot([0 max_disp],[0 abs(max_load)])
 title(strcat(title_prefix, ' load/displacement'))
 xlabel('displacement [mm]')
 ylabel('load [N]')
 grid on
-saveas(gcf,'../fig/task2_load_disp.png')
