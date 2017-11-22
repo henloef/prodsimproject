@@ -14,9 +14,9 @@ theta_0 = pi - theta_L; %rad theta when (x,y) = (0,0)
 
 delta_theta = (theta_0 - theta_L)/n_elements; %difference in arc positions of each beam element
 
-theta_list = zeros(21,1);
+theta_list = zeros(n_elements+1,1);
 
-for i = 1:21
+for i = 1:n_elements+1
     theta_list(i) = theta_0 - delta_theta*(i-1); %list containing angles representing points along the arch
 end
 
@@ -41,6 +41,3 @@ for i = 1:length(theta_list)
     dof(i,2) = i*3-1;
     dof(i,3) = i*3;   
 end
-
-
-    %skriver noe for å logge meg inn
