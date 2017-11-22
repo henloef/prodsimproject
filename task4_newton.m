@@ -50,7 +50,7 @@ for i=1:increments
 end
 
 %% Plots
-title_prefix = 'Newton iteration,';
+title_prefix = 'Comparison,';
 
 % Plot deformed
 Coord = new_coord(Coord_0,a);
@@ -60,7 +60,7 @@ sfac = 1;
 Ed = extract(Edof, a);
 eldisp2(Ex, Ey, Ed, plotpar, sfac);
 title(strcat(title_prefix, ' geometry last increment'))
-saveas(gcf,'../fig/task4_geometry.png')
+%saveas(gcf,'../fig/task4_geometry.png')
 
 % Plot residual
 figure
@@ -69,18 +69,23 @@ title(strcat(title_prefix, ' residual last increment'))
 xlabel('iteration')
 ylabel('residual [N]')
 grid on
-saveas(gcf,'../fig/task4_residual.png')
+%saveas(gcf,'../fig/task4_residual.png')
 
 % Plot load displacement
 abaqus = csvread('./abaqus_data/nonlingeom26700N.csv');
+primary = csvread('../task5_response_primary.csv');
+secondary = csvread('../task5_response_secondary.csv');
 figure; hold on
-plot(u_plot,abs(f_magnitude))
-plot([0 50.95],[0 abs(max_load)])
-plot(abaqus(:,1),abaqus(:,2))
-legend('Newton iteration', 'Direct method', 'Abaqus')
+plot([0 50.95],[0 abs(max_load)],'b')
+plot(u_plot,abs(f_magnitude),'-xr')
+plot(abaqus(:,1),abaqus(:,2),'-om')
+plot(primary(:,1),primary(:,2),'k')
+plot(secondary(:,1),secondary(:,2),'g')
+
+legend('Direct stiffness method', 'Newton iteration', 'Abaqus', 'Arclength primary', 'Arclength secondary')
 title(strcat(title_prefix, ' load/displacement'))
 xlabel('displacement [mm]')
-axis([0  200 0 3.5e4])
+axis([0  600 0 3.5e4])
 ylabel('load [N]')
 grid on
-saveas(gcf,'../fig/task4_load_disp.png')
+saveas(gcf,'../fig/all_comparison_v2.png')

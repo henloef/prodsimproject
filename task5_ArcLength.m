@@ -6,10 +6,8 @@ thickness = 10; % mm
 width = 100; % mm
 [A, I] = area_properties(thickness, width);
 ep = [E A I];
-max_load = -100; % N
-tolerance = 1.e-9; 
 
-increments = 310;
+increments = 350;
 max_iterations = 20;
 max_residual = 0.01;
 
@@ -27,7 +25,7 @@ v_hat = zeros(total_dof,1);
 lambda = 0;
 
 %% Solver tuning variables
-f_magnitude = -66; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
+f_magnitude = -63; %This is the total force applied, which through lambda will be increased until the total f_magnitude is applied to the structure.
 delta_s = 40;
 q = load_vector(Edof, f_magnitude); %This is the load vector, where the values corresponds to force magnitude, and placement in vector corresponds to node and direction.
 
@@ -49,22 +47,20 @@ if save_video
     vid = VideoWriter('../response.avi');
     open(vid);
 end
-    
+% q(horizontal_dof) = 1e-2
 
+
+%% Some initial values
+[K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
+    %K denotes the stiffness in the particular global displacement v_hat.    
+
+w_q = solveqOM(K,q,bc);     
+    %w_q is here the displacement "velocity" with repsect to lambda. 
+    %Horizontal vector consisting of velocities of all
+    %translations and rotations.
+
+%% Solve
 for i = 1:increments
-    if i == 10
-        q(horizontal_dof) = 10;
-    else
-        q(horizontal_dof) = 0;
-    end
-    [K, fi] = global_K_internal_force(Edof, Coord_0, v_hat, ep);
-        %K denotes the stiffness in the particular global displacement v_hat.    
-    
-    w_q = solveqOM(K,q,bc);     
-        %w_q is here the displacement "velocity" with repsect to lambda. 
-        %Horizontal vector consisting of velocities of all
-        %translations and rotations.
-    
     f = sqrt(1+(w_q')*(w_q));    
         %Just a simplification variable for the
         %relation between delta_s and delta_lambda
@@ -141,19 +137,17 @@ for i = 1:increments
     fprintf('%f percentage done\n',i/increments*100)
 end
 
-% Plot deformed
-% Coord = new_coord(Coord_0,v_hat);
-% [Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
-% plotpar = [2 2 1];
-% sfac = 1;
-% Ed = extract(Edof, v_hat);
-% eldisp2(Ex, Ey, Ed, plotpar, sfac);
-% figure
-% axes('Position',[0 0 1 1])
-% movie(M,5)
-% movie2avi(M,'../response.avi','Compression','Cinepak');
 if save_video
     close(vid);
+else
+    Coord = new_coord(Coord_0,v_hat);
+    [Ex, Ey] = coordxtr(Edof, Coord, Dof, 2);
+    plotpar = [2 2 1];
+    sfac = 1;
+    Ed = extract(Edof, v_hat);
+    eldisp2(Ex, Ey, Ed, plotpar, sfac);
+    title('Arc length, secondary buckling')
+    %saveas(gcf,'../fig/task5_buckling_secondary.png')
 end
 
 figure
@@ -161,3 +155,5 @@ plot(response_plot(:,1),response_plot(:,2))
 title('Arc length, Load/displacement')
 xlabel('displacement [mm]')
 ylabel('load [N]')
+% saveas(gcf,'../fig/task5_response_full.png')
+% csvwrite('..\task5_response_secondary.csv',response_plot)
